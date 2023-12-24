@@ -1,37 +1,83 @@
 import { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
 
 function App() {
+
+  const loginbtn = (
+    <>
+      <button onClick={() => {setPage(loginPage)}}>login</button>
+      <button onClick={() => {setPage(signupPage)}}>signup</button>
+    </>
+  )
+
+  const logout = () => {
+    setUser("You haven't logged in!")
+    setCurprofile({
+      name: "none",
+      profile: "none"
+    })
+    setCurpost([])
+    setIslogin(false)
+    setBtn(loginbtn)
+  }
+
+  const logoutbtn = (
+      <button onClick={() => {logout()}}>logout</button>
+  )
+
   const [page, setPage] = useState()
   const [user, setUser] = useState()
   const [curprofile, setCurprofile] = useState({
     name: "none",
     profile: "none"
   })
+  
+  const [islogin, setIslogin] = useState(false)
   const [curpost, setCurpost] = useState([])
+  const [btn, setBtn] = useState(loginbtn)
+
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
   useEffect(() =>{
+
     setPage((<>Baby forum</>))
+
     setUser("You haven't logged in!")
     setCurprofile({
       name: "none",
       profile: "none"
     })
     setCurpost([{user: "a", content: "bb"}])
+    setIslogin(false)
+    setBtn(loginbtn)
   }, [])
 
+  const login = () => {
+    console.log("login", username, password)
+  }
+
+  const signup = () => {
+    console.log("signup", username, password)
+  }
+
+  const getUser = (user) => {
+    console.log("get", user)
+  }
+
   const loginPage = (
-    <form action="/login" method='post'>
-      <input type='text' name='username' placeholder="Username" />
-      <input type="password" name="password" placeholder="Password" />
-      <input type="submit" value="login" />
-    </form>
+    <>
+      <input type='text' name='username' value={username} onChange={(e) => setUsername(e)} placeholder="Username" />
+      <input type="password" name="password" value={password} onChange={(e) => setPassword(e)} placeholder="Password" />
+      <button onClick={() => login()}>login</button>
+    </>
   )
 
   const signupPage = (
-    <form action="/signup" method='post'>
-      <input type='text' name='username' placeholder="Username" />
-      <input type="password" name="password" placeholder="Password" />
-      <input type="submit" value="signup" />
-    </form>
+    <>
+      <input type='text' name='username' value={username} onChange={(e) => setUsername(e)} placeholder="Username" />
+      <input type="password" name="password" value={password} onChange={(e) => setPassword(e)} placeholder="Password" />
+      <button onClick={() => signup()}>signup</button>
+    </>
   )
 
   const profilePage = (
@@ -49,7 +95,7 @@ function App() {
       </form>
       <div>--------------------------------------------------</div>
       <div>
-        {curpost.map((e) => <div>{e.user}: {e.content}</div>)}
+        {curpost.map((e) => <div onClick={() => getUser(e.user)}>{e.user}: {e.content}</div>)}
       </div>
     </>
   )
@@ -58,10 +104,11 @@ function App() {
     <>
       <form action='/friend' method='post'>
         <input type='text' name='account' placeholder='account' />
-        <input type="submit" value="send request"/>
+        <input type="submit" value="send request" />
       </form>
       <div>--------------------------------------------------</div>
       <div>requests: </div>
+      {}
       <div></div>
       <div>--------------------------------------------------</div>
       <div>friends: </div>
@@ -75,11 +122,12 @@ function App() {
       stream
     </>
   )
+
   return (
     <>
+      <button onClick={() => console.log(document.cookie)}>cookie</button>
       <div>
-        <button onClick={() => {setPage(loginPage)}}>login</button>
-        <button onClick={() => {setPage(signupPage)}}>signup</button>
+        {btn}
         <button onClick={() => {setPage(profilePage)}}>profile</button>
         <button onClick={() => {setPage(postPage)}}>post</button>
         <button onClick={() => {setPage(friendPage)}}>friend</button>
